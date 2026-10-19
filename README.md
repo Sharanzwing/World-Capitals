@@ -1,4 +1,4 @@
-# 🌍 GeoQuest — World Capital Quiz
+# 🌍 World Capitals Quiz
 
 [![Node.js](https://img.shields.io/badge/Node.js-v18%2B-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 [![Express.js](https://img.shields.io/badge/Express.js-4.18-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
@@ -6,27 +6,18 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15%2B-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
-> **An interactive, fast-paced geography trivia web application that challenges players to test and sharpen their knowledge of world capitals across 250+ countries.**
+> **A full-stack World Capitals quiz web app built with Node.js, Express, EJS, and PostgreSQL, styled with an enhanced modern glassmorphism UI.**
 
 ---
 
-## ✨ Key Features & UX Enhancements
+## ✨ Features
 
-- 🌍 **250+ World Capitals**: Comprehensive dataset loaded directly from a PostgreSQL relational database with zero cold start.
-- 🎨 **Modern Glassmorphic UI**: High-contrast, ambient dark overlay over scenic cartography with smooth gradients, card depth, and Google Fonts (`Outfit` & `Plus Jakarta Sans`).
-- 🔥 **Streak & Score Tracking**: Real-time score counter and streak multiplier that elevates excitement with every consecutive correct guess.
-- 🏆 **Persistent High Scores**: Automatically saves all-time personal best scores in the browser's `localStorage`.
-- 💡 **Smart Hint System**: Stuck on a country? Click the hint toggle to reveal the capital's starting letter and character length without revealing the whole answer.
-- ⏭️ **Skip Question Support**: Seamless skip action allowing players to advance if they do not know a capital.
-- 🎉 **Visual & Audio Feedback**:
-  - Fullscreen canvas confetti bursts on correct answers.
-  - Clean synthesizer audio chimes via the **Web Audio API** (with a dedicated mute/unmute toggle).
-- 🎯 **Polished Game Over Review**:
-  - Replaces jarring browser `alert()` popups with an in-card game over review.
-  - Displays the missed country, the correct capital in high contrast, and your guess.
-  - Dynamically computes a playful adventurer rank (e.g. *Continental Explorer*, *Atlas Master*).
-  - One-click instant **Play Again** restart button.
-- 🛡️ **Resilient Fallback Mode**: If PostgreSQL is ever offline or unconfigured, the application gracefully falls back to `capitals.csv` automatically so the quiz is always playable!
+- 🌍 **250+ World Capitals**: Loaded directly from a PostgreSQL relational database table.
+- 🎨 **Modern Glassmorphic UI**: High-contrast, ambient dark backdrop over world cartography with clean Google Fonts (`Outfit` & `Plus Jakarta Sans`).
+- ⭐ **Score Tracker**: Displays real-time total score.
+- 🎯 **Interactive Feedback**: Instant checkmark (`✔`) and cross (`✖`) animations on submit.
+- 🔄 **Restart Mechanism**: Clean restart button to immediately begin a fresh run.
+- ☁️ **Cloud Database Ready**: Works on local `localhost` pgAdmin and deploys seamlessly to **Render** or **Vercel** via `DATABASE_URL`.
 
 ---
 
@@ -37,10 +28,8 @@
 | **Runtime** | Node.js (ES Modules) |
 | **Backend Framework** | Express.js |
 | **Template Engine** | EJS (Embedded JavaScript) |
-| **Database** | PostgreSQL (`pg` connection pool) |
-| **Environment Config** | Dotenv (`.env`) |
-| **Styling & Design** | Modern CSS3 (Glassmorphism, Flexbox, CSS Grid, Custom Properties) |
-| **Interactivity** | Vanilla JavaScript (Canvas Confetti, Web Audio API, LocalStorage) |
+| **Database** | PostgreSQL (`pg` Client) |
+| **Styling** | Modern CSS3 (Glassmorphism, Flexbox, Animations) |
 
 ---
 
@@ -50,151 +39,113 @@
 World+Capital+Quiz/
 ├── public/
 │   ├── images/
-│   │   └── background.jpg         # High-resolution world map background
-│   ├── scripts/
-│   │   └── game.js                # Audio effects, confetti, high-score & input UX
+│   │   └── background.jpg         # World map background
 │   └── styles/
-│       └── main.css               # Modern responsive glassmorphism styles
+│       └── main.css               # Modern glassmorphism stylesheet
 ├── views/
-│   └── index.ejs                  # Dynamic EJS quiz & game over template
-├── .env.example                   # Sample environment variable template
-├── .gitignore                     # Git ignore rules for node_modules & credentials
+│   └── index.ejs                  # EJS quiz template
+├── .env.example                   # Environment variable template
+├── .gitignore                     # Git ignore rules
 ├── capitals.csv                   # 250+ countries and capitals dataset
-├── index.js                       # Express server, DB queries, and game routing
-├── package.json                   # Project scripts and dependencies
-└── README.md                      # Project documentation & GitHub guide
+├── index.js                       # Express server and PostgreSQL logic
+├── package.json                   # Project configuration
+└── README.md                      # Documentation
 ```
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Local Setup (pgAdmin / Localhost)
 
 ### 1. Prerequisites
-Ensure you have the following installed on your machine:
 - [Node.js](https://nodejs.org/) (v16.x or newer)
-- [PostgreSQL](https://www.postgresql.org/) (Optional but recommended; app has automatic CSV fallback)
+- [PostgreSQL & pgAdmin](https://www.postgresql.org/)
 - [Git](https://git-scm.com/)
 
----
-
 ### 2. Installation
+```bash
+git clone https://github.com/Sharanzwing/World-Capitals.git
+cd World-Capitals
+npm install
+```
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/<your-username>/world-capital-quiz.git
-   cd world-capital-quiz
-   ```
-
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-
----
-
-### 3. Database Setup (PostgreSQL)
-
-1. Open `psql` or **pgAdmin** and create a new database named `world`:
+### 3. Database Setup (pgAdmin / Localhost)
+1. In pgAdmin, create a database named `world`:
    ```sql
    CREATE DATABASE world;
    ```
-
-2. Connect to the `world` database and create the `capitals` table:
+2. Open the Query Tool for `world` and create the `capitals` table:
    ```sql
-   \c world;
-
    CREATE TABLE capitals (
      id SERIAL PRIMARY KEY,
      country VARCHAR(100),
      capital VARCHAR(100)
    );
    ```
+3. Import `capitals.csv`:
+   - In pgAdmin: Right-click `capitals` table $\rightarrow$ **Import/Export Data** $\rightarrow$ select `capitals.csv`, Header: Yes, Delimiter: `,`.
+   - Or using psql command:
+     ```sql
+     \copy capitals FROM 'capitals.csv' DELIMITER ',' CSV HEADER;
+     ```
 
-3. Import the dataset from `capitals.csv`:
-   ```sql
-   \copy capitals FROM 'capitals.csv' DELIMITER ',' CSV HEADER;
-   ```
-   *(Alternatively, use pgAdmin's "Import/Export Data" GUI tool)*.
-
----
-
-### 4. Configure Environment Variables
-
-1. Copy `.env.example` to create your local `.env` file:
-   ```bash
-   cp .env.example .env
-   ```
-   *(On Windows PowerShell: `Copy-Item .env.example .env`)*
-
-2. Update `.env` with your PostgreSQL credentials:
-   ```env
-   PORT=3000
-   DB_USER=postgres
-   DB_HOST=localhost
-   DB_DATABASE=world
-   DB_PASSWORD=your_actual_password
-   DB_PORT=5432
-   ```
-
-> **Note**: If you don't configure PostgreSQL, GeoQuest will automatically load `capitals.csv` in offline fallback mode!
-
----
-
-### 5. Running the Application
-
-- **Standard Run:**
-  ```bash
-  npm start
-  ```
-
-- **Development Mode (Auto-restart on change):**
-  ```bash
-  npm run dev
-  ```
-
-Open your browser and navigate to:
-```text
-http://localhost:3000
+### 4. Run the App
+```bash
+npm start
 ```
+Navigate to `http://localhost:3000`.
 
 ---
 
-## 🎮 How to Play
+## ☁️ How to Connect a Free PostgreSQL Database on Render or Vercel
 
-1. A random country or territory name appears on the card.
-2. Type the correct capital city into the input field and press <kbd>Enter</kbd> or click **Submit Answer**.
-3. If correct:
-   - Your score and streak increase!
-   - Confetti bursts and an upbeat chime plays.
-   - The next random country is served immediately.
-4. If you're stuck, toggle **💡 Need a hint?** to view the starting letter and character count.
-5. If you enter an incorrect answer or skip:
-   - Game over screen reveals the missed capital alongside your response.
-   - Your final score and streak are compared with your all-time high score.
-   - Click **Play Again 🔄** to reset and start a new run!
+When your app is deployed to **Render** or **Vercel**, it cannot connect to your personal PC's `localhost`. You need a free cloud-hosted PostgreSQL database.
+
+### Option A: Free PostgreSQL on Render
+1. Go to your [Render Dashboard](https://dashboard.render.com/).
+2. Click **New +** $\rightarrow$ **PostgreSQL**.
+3. Name your database (e.g., `world-db`) and click **Create Database**.
+4. Once created, copy the **Internal Database URL** (for Render-to-Render) or **External Database URL**.
+5. In your Render Web Service dashboard:
+   - Go to **Environment** tab.
+   - Add an environment variable:
+     - **Key**: `DATABASE_URL`
+     - **Value**: *(Paste the Render Database URL)*
+   - Save changes.
 
 ---
 
-## 🤝 Contributing
+### Option B: Free Permanent PostgreSQL on Neon.tech (Recommended for Vercel & Render)
+*Note: Render's free PostgreSQL instances expire after 30 days. [Neon.tech](https://neon.tech/) provides a permanent 100% free serverless PostgreSQL database.*
 
-Contributions, issues, and feature requests are welcome!
-Feel free to check the [issues page](https://github.com/<your-username>/world-capital-quiz/issues).
+1. Sign up at [neon.tech](https://neon.tech/) (free, takes 30 seconds).
+2. Create a project named `world`.
+3. In the Neon dashboard, go to the **SQL Editor** and run:
+   ```sql
+   CREATE TABLE capitals (
+     id SERIAL PRIMARY KEY,
+     country VARCHAR(100),
+     capital VARCHAR(100)
+   );
+   ```
+4. Copy the **Connection String** (`postgres://...`).
+5. In your **Render** or **Vercel** Project Settings:
+   - Add Environment Variable: `DATABASE_URL` = your Neon connection string.
 
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+---
+
+### 📥 How to Import `capitals.csv` into Your Cloud Database
+
+You can import the 250+ capitals directly into your Render or Neon cloud database:
+
+#### Method 1: Using pgAdmin on your PC
+1. In pgAdmin, right-click **Servers** $\rightarrow$ **Register** $\rightarrow$ **Server**.
+2. Paste the cloud database Host, Database, User, Password, and set SSL to **Require**.
+3. Once connected, right-click `capitals` table $\rightarrow$ **Import/Export Data** $\rightarrow$ select `capitals.csv` and import!
+
+#### Method 2: Paste the Seed SQL
+If you prefer running a single SQL script without uploading files, you can generate multi-row `INSERT` statements or run the copy command in `psql`.
 
 ---
 
 ## 📄 License
-
-This project is licensed under the **MIT License** — feel free to use and adapt it for learning or personal projects.
-
----
-
-## 🙏 Acknowledgments
-
-- Built based on Angela Yu's [The Complete 2024 Web Development Bootcamp](https://www.udemy.com/course/the-complete-web-development-bootcamp/).
-- Enhanced with modern glassmorphism UI, audio synthesizers, confetti feedback, and high score persistence.
+This project is licensed under the **MIT License**.
