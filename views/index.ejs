@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GeoQuest — World Capital Quiz</title>
+  <meta name="description" content="Test and sharpen your world geography knowledge with this interactive World Capitals Quiz.">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles/main.css">
+</head>
+
+<body id="app">
+  <div class="background-overlay"></div>
+
+  <!-- Confetti Canvas -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <main class="page-wrapper">
+    <!-- Header Navigation -->
+    <header class="app-header">
+      <div class="logo-container">
+        <div class="logo-icon">🌍</div>
+        <div>
+          <h1 class="logo-title">GeoQuest</h1>
+          <p class="logo-subtitle">World Capitals Quiz</p>
+        </div>
+      </div>
+
+      <div class="header-controls">
+        <button id="soundToggle" class="icon-btn" type="button" title="Toggle Sound (Mute/Unmute)" aria-label="Toggle Sound">
+          <span id="soundIcon">🔊</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Score & Stats Bar -->
+    <section class="stats-bar" aria-label="Game Statistics">
+      <div class="stat-pill score-pill" title="Current Score">
+        <span class="stat-icon">⭐</span>
+        <div class="stat-content">
+          <span class="stat-label">SCORE</span>
+          <span id="score" class="stat-value"><%= locals.totalScore ? totalScore : 0 %></span>
+        </div>
+      </div>
+
+      <div class="stat-pill streak-pill" title="Current Winning Streak">
+        <span class="stat-icon">🔥</span>
+        <div class="stat-content">
+          <span class="stat-label">STREAK</span>
+          <span id="streak" class="stat-value"><%= locals.streak ? streak : 0 %></span>
+        </div>
+      </div>
+
+      <div class="stat-pill best-pill" title="All-time Best Score">
+        <span class="stat-icon">🏆</span>
+        <div class="stat-content">
+          <span class="stat-label">BEST</span>
+          <span id="bestScore" class="stat-value">0</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Game Card -->
+    <div class="quiz-card <%= locals.gameOver ? 'card-game-over' : '' %> <%= locals.wasCorrect ? 'card-correct' : '' %>">
+      
+      <% if (!locals.gameOver) { %>
+        <!-- ACTIVE QUIZ STATE -->
+        
+        <!-- Feedback Banner for Correct Guess -->
+        <% if (locals.wasCorrect === true && locals.previousCountry) { %>
+          <div class="toast-feedback toast-success" role="alert">
+            <span class="toast-icon">✔</span>
+            <span>Spot on! The capital of <strong><%= previousCountry %></strong> is <strong><%= previousCapital %></strong>.</span>
+          </div>
+        <% } %>
+
+        <div class="question-header">
+          <span class="country-badge">COUNTRY / TERRITORY</span>
+          <h2 id="countryName" class="country-name"><%= question.country %></h2>
+          <p class="question-instruction">Name the capital city of this country</p>
+        </div>
+
+        <!-- Hint Accordion -->
+        <% if (locals.hint) { %>
+          <div class="hint-container">
+            <button type="button" class="hint-toggle" id="hintBtn" aria-expanded="false">
+              <span class="hint-icon">💡</span> Need a hint?
+            </button>
+            <div class="hint-box hidden" id="hintBox">
+              <p class="hint-text"><%= hint %></p>
+            </div>
+          </div>
+        <% } %>
+
+        <!-- Submit Form -->
+        <form class="quiz-form" action="/submit" method="post" id="quizForm">
+          <div class="input-group">
+            <input 
+              type="text" 
+              name="answer" 
+              id="userInput" 
+              class="quiz-input" 
+              placeholder="Type capital city name..." 
+              autofocus 
+              autocomplete="off" 
+              spellcheck="false"
+              required
+            >
+            <button type="button" class="clear-input-btn hidden" id="clearBtn" title="Clear input" aria-label="Clear input">✕</button>
+          </div>
+
+          <div class="button-group">
+            <button type="submit" class="btn btn-primary" id="submitBtn">
+              <span>Submit Answer</span>
+              <span class="btn-arrow">↵</span>
+              <% if (locals.wasCorrect === true) { %>
+                <span class="checkmark">✔</span>
+              <% } else if (locals.wasCorrect === false) { %>
+                <span class="cross" id="error">✖</span>
+              <% } %>
+            </button>
+
+            <button type="submit" name="action" value="skip" class="btn btn-secondary" formnovalidate title="Give up on this question and see answer">
+              <span>Skip</span>
+              <span class="btn-icon">⏭️</span>
+            </button>
+          </div>
+        </form>
+
+      <% } else { %>
+        <!-- GAME OVER STATE -->
+        <div class="game-over-panel" role="region" aria-label="Game Over Summary">
+          <div class="game-over-icon-wrapper">
+            <span class="game-over-icon">🎯</span>
+          </div>
+          
+          <h2 class="game-over-title">Game Over!</h2>
+          <p class="game-over-subtitle" id="rankSubtitle">Nice effort! Every mistake is a geography lesson.</p>
+
+          <div class="answer-reveal-card">
+            <span class="reveal-badge">MISSED QUESTION</span>
+            <div class="reveal-country"><%= locals.previousCountry %></div>
+            <div class="reveal-answer-row">
+              <span class="label">Correct Capital:</span>
+              <strong class="correct-text"><%= locals.previousCapital %></strong>
+            </div>
+            <% if (locals.userAnswer) { %>
+              <div class="reveal-user-row">
+                <span class="label">Your Answer:</span>
+                <span class="wrong-text"><%= locals.userAnswer %></span>
+              </div>
+            <% } %>
+          </div>
+
+          <!-- Score Summary Matrix -->
+          <div class="summary-matrix">
+            <div class="matrix-item">
+              <span class="matrix-label">Final Score</span>
+              <span class="matrix-value score-highlight"><%= locals.totalScore || 0 %></span>
+            </div>
+            <div class="matrix-item">
+              <span class="matrix-label">Streak</span>
+              <span class="matrix-value"><%= locals.streak || 0 %> 🔥</span>
+            </div>
+            <div class="matrix-item">
+              <span class="matrix-label">All-time Best</span>
+              <span class="matrix-value" id="summaryBestScore">0</span>
+            </div>
+          </div>
+
+          <div class="game-over-actions">
+            <a href="/" class="btn btn-restart" id="restartBtn">
+              <span>Play Again</span>
+              <span class="btn-icon">🔄</span>
+            </a>
+          </div>
+        </div>
+      <% } %>
+
+    </div>
+
+    <!-- Footer info -->
+    <footer class="app-footer">
+      <p>Powered by Node.js, Express & PostgreSQL • Database includes 250+ world nations</p>
+    </footer>
+  </main>
+
+  <!-- Pass server-side state cleanly to client JavaScript -->
+  <script>
+    const gameState = {
+      wasCorrect: <%= locals.wasCorrect === true ? 'true' : (locals.wasCorrect === false ? 'false' : 'null') %>,
+      gameOver: <%= locals.gameOver ? 'true' : 'false' %>,
+      totalScore: <%= locals.totalScore ? totalScore : 0 %>,
+      streak: <%= locals.streak ? streak : 0 %>
+    };
+  </script>
+  <script src="/scripts/game.js"></script>
+</body>
+</html>
