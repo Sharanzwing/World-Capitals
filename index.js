@@ -13,13 +13,19 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // PostgreSQL Database Client configuration
-const db = new pg.Client({
-  user: process.env.DB_USER || "postgres",
-  host: process.env.DB_HOST || "localhost",
-  database: process.env.DB_DATABASE || "world",
-  password: process.env.DB_PASSWORD || "postgres",
-  port: parseInt(process.env.DB_PORT, 10) || 5432,
-});
+// Supports cloud connection strings (e.g. Render DATABASE_URL) or individual env vars for localhost
+const db = process.env.DATABASE_URL
+  ? new pg.Client({
+      connectionString: process.env.DATABASE_URL,
+      ssl: { rejectUnauthorized: false },
+    })
+  : new pg.Client({
+      user: process.env.DB_USER || "postgres",
+      host: process.env.DB_HOST || "localhost",
+      database: process.env.DB_DATABASE || "world",
+      password: process.env.DB_PASSWORD || "postgres",
+      port: parseInt(process.env.DB_PORT, 10) || 5432,
+    });
 
 let quiz = [];
 let totalCorrect = 0;
