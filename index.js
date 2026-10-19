@@ -17,17 +17,16 @@ const db = new pg.Client({
   ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false,
 });
 
-db.connect();
+await db.connect();
 
 let quiz = [];
-db.query("SELECT * FROM capitals", (err, res) => {
-  if (err) {
-    console.error("Error executing query", err.stack);
-  } else {
-    quiz = res.rows;
-  }
-  db.end();
-});
+try {
+  const res = await db.query("SELECT * FROM capitals");
+  quiz = res.rows;
+  await db.end();
+} catch (err) {
+  console.error("Error executing query", err.stack);
+}
 
 let totalCorrect = 0;
 
